@@ -1,60 +1,59 @@
-
-let filters={
-    brightness : {
-        value : 100,
-        min : 0,
-        max : 200,
-        unit : "%"
-    },
-    contrast :  {
-        value : 100,
-        min : 0,
-        max : 200,
-        unit : "%"
-    },
-    saturation :  {
-        value : 100,
-        min : 0,
-        max : 200,
-        unit : "%"
-    },
-    hueRotation :  {
-        value : 0,
-        min : 0,
-        max : 360,
-        unit : "deg"
-    },
-    blur :  {
-        value : 0,
-        min : 0,
-        max : 20,
-        unit : "px"
-    },
-    grayscale : {
-        value : 0,
-        min : 0,
-        max : 100,
-        unit : "%"
-    },
-    sepia : { 
-        value : 0,
-        min : 0,
-        max : 100,
-        unit : "%"
-    },
-    opacity : {
-        value : 100,
-        min : 0,
-        max : 100,
-        unit : "%"
-    },
-    invert : {
-        value : 0,
-        min : 0,
-        max : 100,
-        unit : "%"
-    },
-}
+let filters = {
+  brightness: {
+    value: 100,
+    min: 0,
+    max: 200,
+    unit: "%",
+  },
+  contrast: {
+    value: 100,
+    min: 0,
+    max: 200,
+    unit: "%",
+  },
+  saturation: {
+    value: 100,
+    min: 0,
+    max: 200,
+    unit: "%",
+  },
+  hueRotation: {
+    value: 0,
+    min: 0,
+    max: 360,
+    unit: "deg",
+  },
+  blur: {
+    value: 0,
+    min: 0,
+    max: 20,
+    unit: "px",
+  },
+  grayscale: {
+    value: 0,
+    min: 0,
+    max: 100,
+    unit: "%",
+  },
+  sepia: {
+    value: 0,
+    min: 0,
+    max: 100,
+    unit: "%",
+  },
+  opacity: {
+    value: 100,
+    min: 0,
+    max: 100,
+    unit: "%",
+  },
+  invert: {
+    value: 0,
+    min: 0,
+    max: 100,
+    unit: "%",
+  },
+};
 
 const imageCanvas = document.querySelector("#image-canvas");
 const imageInput = document.querySelector("#image-input");
@@ -62,87 +61,91 @@ const canvasCtx = imageCanvas.getContext("2d");
 const resetBtn = document.querySelector("#reset-btn");
 const downloadBtn = document.querySelector("#download-btn");
 const presetsContainer = document.querySelector(".presets");
+
 let file = null;
 let image = null;
 let imageNotSelectedWarned = false;
 
 const filtersContainer = document.querySelector(".filters-container");
 
-function createFilterElement(name, unit = "%", value, min, max){
-    const div = document.createElement("div");
-    div.classList.add("filter")
+function createFilterElement(name, unit = "%", value, min, max) {
+  const div = document.createElement("div");
+  div.classList.add("filter");
 
-    const input = document.createElement("input");
-    input.type = "range"
-    input.min = min
-    input.max = max
-    input.value = value
-    input.id = name
+  const input = document.createElement("input");
+  input.type = "range";
+  input.min = min;
+  input.max = max;
+  input.value = value;
+  input.id = name;
 
-    const p = document.createElement("p");
-    p.innerText = name
+  const p = document.createElement("p");
+  p.innerText = name;
 
-    div.appendChild(p)
-    div.appendChild(input)
+  div.appendChild(p);
+  div.appendChild(input);
 
-    input.addEventListener("input", (e)=>{
-        // console.log(e.target.value);
-        filters[name].value = e.target.value;
-        // console.log(name, filters[name]);
-        applyFilters();        
-    })
+  input.addEventListener("input", (e) => {
+    // console.log(e.target.value);
+    filters[name].value = e.target.value;
+    // console.log(name, filters[name]);
+    applyFilters();
+  });
 
-    return div
+  return div;
 }
 
-function createFilters(){    
-    Object.keys(filters).forEach(key =>{
-        // console.log(key, filters[key])
+function createFilters() {
+  Object.keys(filters).forEach((key) => {
+    // console.log(key, filters[key])
 
-        const filterElement = createFilterElement(key, filters[key].unit, filters[key].value, filters[key].min, filters[key].max)
-        // console.log(filterElement)
+    const filterElement = createFilterElement(
+      key,
+      filters[key].unit,
+      filters[key].value,
+      filters[key].min,
+      filters[key].max
+    );
+    // console.log(filterElement)
 
-        filtersContainer.appendChild(filterElement);
-
-    })    
+    filtersContainer.appendChild(filterElement);
+  });
 }
 
 createFilters();
 
-imageInput.addEventListener("change", (e)=>{
-    const file = e.target.files[0];    
-    const imagePlaceholder = document.querySelector(".placeholder");
-    imageCanvas.style.display = "block";
-    imagePlaceholder.style.display = "none";
+imageInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  const imagePlaceholder = document.querySelector(".placeholder");
+  imageCanvas.style.display = "block";
+  imagePlaceholder.style.display = "none";
 
-    img = new Image();
-    img.src = URL.createObjectURL(file);
+  const img = new Image();
+  img.src = URL.createObjectURL(file);
 
-    img.onload = ()=>{
-        image = img;
-        imageCanvas.width = img.width;
-        imageCanvas.height = img.height;
-        canvasCtx.drawImage(img,0,0);
+  img.onload = () => {
+    image = img;
+    imageCanvas.width = img.width;
+    imageCanvas.height = img.height;
+    canvasCtx.drawImage(img, 0, 0);
+  };
+});
+
+function applyFilters() {
+  if (!image) {
+    if (!imageNotSelectedWarned) {
+      alert("Please choose an image before applying filters.");
+      imageNotSelectedWarned = true;
     }
-    
-})
+    return;
+  }
 
-function applyFilters(){
-       if (!image) {
-        if (!imageNotSelectedWarned) {
-            alert("Please choose an image before applying filters.");
-            imageNotSelectedWarned = true;
-        }
-        return;
-    }
+  imageNotSelectedWarned = false;
 
-    imageNotSelectedWarned = false;
+  canvasCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
 
-
-    canvasCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
-
-    canvasCtx.save();
-    canvasCtx.filter = `
+  canvasCtx.save();
+  canvasCtx.filter = `
         brightness(${filters.brightness.value}${filters.brightness.unit})
         contrast(${filters.contrast.value}${filters.contrast.unit})
         saturate(${filters.saturation.value}${filters.saturation.unit})
@@ -154,10 +157,9 @@ function applyFilters(){
         invert(${filters.invert.value}${filters.invert.unit})
     `.trim();
 
-    canvasCtx.drawImage(image, 0, 0);
-    canvasCtx.restore();
+  canvasCtx.drawImage(image, 0, 0);
+  canvasCtx.restore();
 }
-
 
 // function applyFilters(){
 //     canvasCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
@@ -175,71 +177,204 @@ function applyFilters(){
 //     canvasCtx.drawImage(image,0,0);
 // }
 
-resetBtn.addEventListener("click", (e)=>{
-        filters={
-        brightness : {
-            value : 100,
-            min : 0,
-            max : 200,
-            unit : "%"
-        },
-        contrast :  {
-            value : 100,
-            min : 0,
-            max : 200,
-            unit : "%"
-        },
-        saturation :  {
-            value : 100,
-            min : 0,
-            max : 200,
-            unit : "%"
-        },
-        hueRotation :  {
-            value : 0,
-            min : 0,
-            max : 360,
-            unit : "deg"
-        },
-        blur :  {
-            value : 0,
-            min : 0,
-            max : 20,
-            unit : "px"
-        },
-        grayscale : {
-            value : 0,
-            min : 0,
-            max : 100,
-            unit : "%"
-        },
-        sepia : { 
-            value : 0,
-            min : 0,
-            max : 100,
-            unit : "%"
-        },
-        opacity : {
-            value : 100,
-            min : 0,
-            max : 100,
-            unit : "%"
-        },
-        invert : {
-            value : 0,
-            min : 0,
-            max : 100,
-            unit : "%"
-        },
-    }
+resetBtn.addEventListener("click", (e) => {
+  filters = {
+    brightness: {
+      value: 100,
+      min: 0,
+      max: 200,
+      unit: "%",
+    },
+    contrast: {
+      value: 100,
+      min: 0,
+      max: 200,
+      unit: "%",
+    },
+    saturation: {
+      value: 100,
+      min: 0,
+      max: 200,
+      unit: "%",
+    },
+    hueRotation: {
+      value: 0,
+      min: 0,
+      max: 360,
+      unit: "deg",
+    },
+    blur: {
+      value: 0,
+      min: 0,
+      max: 20,
+      unit: "px",
+    },
+    grayscale: {
+      value: 0,
+      min: 0,
+      max: 100,
+      unit: "%",
+    },
+    sepia: {
+      value: 0,
+      min: 0,
+      max: 100,
+      unit: "%",
+    },
+    opacity: {
+      value: 100,
+      min: 0,
+      max: 100,
+      unit: "%",
+    },
+    invert: {
+      value: 0,
+      min: 0,
+      max: 100,
+      unit: "%",
+    },
+  };
+  applyFilters();
+  filtersContainer.innerHTML = "";
+  createFilters();
+});
+
+downloadBtn.addEventListener("click", () => {
+  if (!image) {
+    alert("Please choose an image before downloading.");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.download = "Edited-image.png";
+  link.href = imageCanvas.toDataURL();
+  link.click();
+});
+
+const presets = {
+  normal: {
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    hueRotation: 0,
+    blur: 0,
+    grayscale: 0,
+    sepia: 0,
+    opacity: 100,
+    invert: 0,
+  },
+
+  drama: {
+    brightness: 95,
+    contrast: 140,
+    saturation: 130,
+    hueRotation: 0,
+    blur: 0,
+    grayscale: 0,
+    sepia: 0,
+    opacity: 100,
+    invert: 0,
+  },
+
+  vintage: {
+    brightness: 105,
+    contrast: 90,
+    saturation: 80,
+    hueRotation: 0,
+    blur: 0,
+    grayscale: 0,
+    sepia: 35,
+    opacity: 100,
+    invert: 0,
+  },
+
+  oldSchool: {
+    brightness: 110,
+    contrast: 85,
+    saturation: 70,
+    hueRotation: 10,
+    blur: 1,
+    grayscale: 10,
+    sepia: 45,
+    opacity: 100,
+    invert: 0,
+  },
+
+  blackAndWhite: {
+    brightness: 100,
+    contrast: 120,
+    saturation: 0,
+    hueRotation: 0,
+    blur: 0,
+    grayscale: 100,
+    sepia: 0,
+    opacity: 100,
+    invert: 0,
+  },
+
+  cinematic: {
+    brightness: 95,
+    contrast: 135,
+    saturation: 110,
+    hueRotation: -10,
+    blur: 0,
+    grayscale: 0,
+    sepia: 5,
+    opacity: 100,
+    invert: 0,
+  },
+
+  faded: {
+    brightness: 110,
+    contrast: 80,
+    saturation: 85,
+    hueRotation: 0,
+    blur: 0,
+    grayscale: 0,
+    sepia: 10,
+    opacity: 100,
+    invert: 0,
+  },
+
+  coolTone: {
+    brightness: 100,
+    contrast: 110,
+    saturation: 95,
+    hueRotation: 200,
+    blur: 0,
+    grayscale: 0,
+    sepia: 0,
+    opacity: 100,
+    invert: 0,
+  },
+
+  warmTone: {
+    brightness: 105,
+    contrast: 110,
+    saturation: 115,
+    hueRotation: 20,
+    blur: 0,
+    grayscale: 0,
+    sepia: 15,
+    opacity: 100,
+    invert: 0,
+  },
+};
+
+Object.keys(presets).forEach((presetName) => {
+  const presetButton = document.createElement("button");
+  presetButton.classList.add("btn");
+  presetButton.innerText = presetName;
+  presetsContainer.appendChild(presetButton);
+
+  presetButton.addEventListener("click", () => {
+    const preset = presets[presetName];
+
+    Object.keys(preset).forEach((filterName) => {
+      filters[filterName].value = preset[filterName];
+    });
     applyFilters();
     filtersContainer.innerHTML = "";
     createFilters();
-})
-
-downloadBtn.addEventListener("click",()=>{
-    const link = document.createElement("a");
-    link.download = "Edited-image.png";
-    link.href = imageCanvas.toDataURL();
-    link.click();
-})
+  });
+});
